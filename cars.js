@@ -6,7 +6,7 @@ $(function(){
 	var darkbackground = "#8A9B93";
 	var background = "#98B0A3";
 	var lines = "#000200";
-	var speed = 120;
+	var speed = 33;
 
 	canvas.style.background = background;
 	canvas.width = document.body.clientWidth;
@@ -186,12 +186,12 @@ $(function(){
 		var that = this;
 		this.left = function(){
 			if(that.position.x != 1)
-				that.position.x--;
+				that.position.x-=3
 		}
 
 		this.right = function(){
 			if(that.position.x != 7)
-			that.position.x++;
+			that.position.x+=3;
 		}
 		this.up = function(){
 			if(that.position.y != 1)
@@ -329,7 +329,6 @@ $(function(){
 					{
 						if(this.car.shape[gx][gy] === 1 && car.shape[cx][cy] === 1 && (this.car.position.x + gx - (car.position.x + cx)) === 0 && (this.car.position.y + gy - (car.position.y + cy)) === 1)
 						{
-							console.log(this.car.position.x + gx );
 							return true;
 						}	
 					}
