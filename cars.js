@@ -83,7 +83,7 @@ $(function(){
 		this.gap = gap;
 
 		// container for actual cars 
-		this.state = new Array();
+		this.state = null;
 
 		this.score = score;
 
@@ -108,24 +108,17 @@ $(function(){
 			var x = Math.floor(Math.random() * (7 - 1) + 1);
 			var type = Math.floor(Math.random() * (this.cars.length - 0) + 0)
 			var rnd = new car(new vector(x,1), type, 0, this.tile, this.cars, 2);
-			this.state.unshift(rnd)
+			this.state = rnd;
 			this.next = false;
 		}
 		else
 		{
 			if(this.state)
-			for(var i=0; i<this.state.length; i++)
 			{
-				if(this.state[i])
-				{
-					this.state[i].update();
-					if(this.state[i].erease)
-					{
-						this.next = true;
-						this.state[i] = null;
-						break;
-					}
-				}
+				this.state.update();
+
+				if(this.state.erease)
+					this.next = true;
 			}
 		}
 
@@ -143,9 +136,8 @@ $(function(){
 			}
 		}
 
-		for(var i=0; i<this.state.length; i++)
-			if(this.state[i])
-				this.state[i].draw(ctx)
+		if(this.state)
+			this.state.draw(ctx)
 
 		this.player.draw(ctx);
 
