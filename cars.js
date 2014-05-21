@@ -6,6 +6,7 @@ $(function(){
 	var darkbackground = "#8A9B93";
 	var background = "#98B0A3";
 	var lines = "#000200";
+	var speed = 60;
 
 	canvas.style.background = background;
 	canvas.width = document.body.clientWidth;
@@ -95,10 +96,38 @@ $(function(){
 		// ref to player
 		this.player = player;
 
+		this.next = true;
+
 	}
 
 	board.prototype.update = function(){
-	
+		
+		if(this.next)
+		{
+			//position, type, difficulty, tile, cars, gap
+			var x = Math.floor(Math.random() * (7 - 1) + 1);
+			var type = Math.floor(Math.random() * (this.cars.length - 0) + 0)
+			var rnd = new car(new vector(x,1), type, 0, this.tile, this.cars, 2);
+			this.state.unshift(rnd)
+			this.next = false;
+		}
+		else
+		{
+			if(this.state)
+			for(var i=0; i<this.state.length; i++)
+			{
+				if(this.state[i])
+				{
+					this.state[i].update();
+					if(this.state[i].erease)
+					{
+						this.next = true;
+						this.state[i] = null;
+						break;
+					}
+				}
+			}
+		}
 
 	}
 
@@ -114,6 +143,12 @@ $(function(){
 			}
 		}
 
+		for(var i=0; i<this.state.length; i++)
+			if(this.state[i])
+				this.state[i].draw(ctx)
+
+		this.player.draw(ctx);
+
 		ctx.moveTo(374, 32);
 		ctx.lineTo(374, 678);
 		ctx.stroke();
@@ -127,6 +162,7 @@ $(function(){
 		this.shape = new Array();
 		this.gap = gap;
 		this.direction = 0;
+		this.erease = false;
 
 		if(this.position.x >= 1 && this.position.x <= 5)
 			this.direction = 0;
@@ -147,13 +183,32 @@ $(function(){
 
 		this.difficulty = difficulty;
 		this.tile = tile;
+
+		var that = this;
+		this.left = function(){
+			if(that.position.x != 1)
+				that.position.x--;
+		}
+
+		this.right = function(){
+			if(that.position.x != 7)
+			that.position.x++;
+		}
+		this.up = function(){
+			if(that.position.y != 1)
+			that.position.y--;
+		}
+		this.down = function(){
+			if(that.position.y != 16)
+			that.position.y++;
+		}
 	} 
 
 	car.prototype.update = function(){
 
-		if(this.difficulty == 0)
+		if(this.difficulty === 0)
 			this.position.y++;
-		else
+		if(this.difficulty === 1)
 		{
 			// setting direction 0 - right, 1 - left
 			if(this.position.x === 1)
@@ -164,11 +219,21 @@ $(function(){
 			this.position.y++;
 
 			if(this.direction === 0)
-				this.position.x++;
+				this.right();
 			else
-				this.position.x--;
+				this.left();
 		}
+		if(this.position.y === 20)
+			this.erease = true;
 
+	}
+
+	car.prototype.left = function(){
+		this.position.x--;
+	}
+
+	car.prototype.right = function(){
+		this.position.x++;
 	}
 
 	car.prototype.draw = function(ctx){
@@ -208,9 +273,9 @@ $(function(){
 		},
 		{
 			"shape": 	[
-						[1, 0, 0],
-						[1, 0, 0],
-						[1, 0, 0],
+						[0, 1, 0],
+						[0, 1, 0],
+						[0, 1, 0],
 						[0, 0, 0]
 				  		],
 			"name": "Bike"
@@ -227,24 +292,58 @@ $(function(){
 	]
 	// end-of-cars examples
 
+	player = function(car, name){
+		this.car = car;
+		this.name = name;
+		this.lives = 3;
+		this.collidable = true;
+	}
+
+	player.prototype.move = function(dir){
+		if(dir.charCode === 97)
+			this.car.left();
+
+		if(dir.charCode === 100)
+			this.car.right();
+
+		if(dir.charCode === 119)
+			this.car.up();
+
+		if(dir.charCode === 115)
+			this.car.down();
+
+	}
+
+	player.prototype.update = function(){
+
+		// check collision
+
+	}
+
+	player.prototype.draw = function(ctx){
+		this.car.draw(ctx);
+	}
+
+	keyboard = function(e){
+		player.move(e);
+	}
+
 	// initialization
 	var tile = new tile(32, 32, background, lines, 2);
 
-	// position, type, difficulty, tile, cars
-	var car = new car(new vector(0,-4), 1, 1, tile, cars, 2)
+	//var cara = new car(new vector(0,-4), 2, 1, tile, cars, 2)
 
-	var player = null;
+	var player = new player(new car(new vector(4,16), 0, 2, tile, cars, 2), "Noob");
+
+	$(document).keypress(keyboard);
 
 	var board = new board(new vector(4,1), 10, 20, 2, 0, tile, cars, player, darkbackground, speed);
 
 	updateGame = function(){
 		board.update();
 		board.draw(ctx);
-
-		car.update();
-		car.draw(ctx);
 	}
 
-	var speed = 500;
+
 	gameloop = setInterval(updateGame, speed);
 })
