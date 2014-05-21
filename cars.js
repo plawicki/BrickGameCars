@@ -17,6 +17,10 @@ $(function(){
 	ctx.szerokosc = canvas.width;
 	ctx.wysokosc = canvas.height;
 
+	ctx.background = background;
+	ctx.darkbackground = darkbackground;
+	ctx.lines = lines;
+
 	ctx.clear = function(){
 		ctx.save();
 
@@ -70,10 +74,8 @@ $(function(){
 
 	}
 
-	board = function(position, width, height, gap, score, tile, cars, player, background, loopSpeed){
+	board = function(position, width, height, gap, score, tile, cars, player, loopSpeed){
 		this.position = position;
-
-		this.background = background;
 
 		this.width = width;
 		this.height = height;
@@ -99,6 +101,7 @@ $(function(){
 		this.next = true;
 
 		this.gameover = false;
+		this.gear = 0;
 	}
 
 	board.prototype.update = function(){
@@ -114,6 +117,11 @@ $(function(){
 				this.next = false;
 				this.score++;
 				this.scoreChanged = true;
+
+				if(this.score < 50)
+					this.gear = Math.floor(2+(this.score)/10);
+				else
+					this.gear = 2+5;
 			}
 			else
 			{
@@ -140,7 +148,7 @@ $(function(){
 			}
 		else
 		{
-			console.log("GAME OVER " + this.score)
+
 		}
 
 	}
@@ -153,7 +161,7 @@ $(function(){
 		{
 			for(var j=1; j<this.height; j++)
 			{
-				this.tile.draw(ctx, new vector(i * this.tile.width + this.gap * i, j * this.tile.height + this.gap * j), this.background);
+				this.tile.draw(ctx, new vector(i * this.tile.width + this.gap * i, j * this.tile.height + this.gap * j), ctx.darkbackground);
 			}
 		}
 
@@ -165,6 +173,19 @@ $(function(){
 		ctx.moveTo(374, 32);
 		ctx.lineTo(374, 678);
 		ctx.stroke();
+
+		ctx.fillStyle = ctx.lines;
+		ctx.font = "28px Arial";
+		ctx.fillText("Score: "+this.score,408,64);
+		ctx.font = "22px Arial";
+		ctx.fillText("Lives: "+this.player.lives,408,128);
+		ctx.fillText("Gear: "+this.gear, 408, 256)
+
+		if(this.gameover)
+		{
+			ctx.font = "32px Arial";
+			ctx.fillText("GAME OVER", 90, 256)
+		}
 
 		ctx.restore();
 	}
@@ -371,11 +392,9 @@ $(function(){
 
 	$(document).keypress(keyboard);
 
-	var board = new board(new vector(4,1), 10, 20, 2, 0, tile, cars, player, darkbackground, loopSpeed);
+	var board = new board(new vector(4,1), 10, 20, 2, 0, tile, cars, player, loopSpeed);
 
 	updateGame = function(){
-		console.log(loopSpeed);
-
 		board.update();
 		if(board.score % 10 === 0 && board.scoreChanged && loopSpeed > 30)
 			changeSpeed(loopSpeed-10)
