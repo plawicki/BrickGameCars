@@ -98,36 +98,46 @@ $(function(){
 
 		this.next = true;
 
+		this.gameover = false;
+
 	}
 
 	board.prototype.update = function(){
 		
-		if(this.next)
-		{
-			//position, type, difficulty, tile, cars, gap
-			var x = Math.floor(Math.random() * (7 - 1) + 1);
-			var type = Math.floor(Math.random() * (this.cars.length - 0) + 0)
-			var rnd = new car(new vector(x,1), type, 0, this.tile, this.cars, 2);
-			this.state = rnd;
-			this.next = false;
-			this.score++;
-		}
+		if(!this.gameover)
+			if(this.next)
+			{
+				//position, type, difficulty, tile, cars, gap
+				var x = Math.floor(Math.random() * (7 - 1) + 1);
+				var type = Math.floor(Math.random() * (this.cars.length - 0) + 0)
+				var rnd = new car(new vector(x,1), type, 0, this.tile, this.cars, 2);
+				this.state = rnd;
+				this.next = false;
+				this.score++;
+			}
+			else
+			{
+				if(this.player.collide(this.state))
+				{
+					console.log("tak");
+					this.state.erease = true;
+					this.player.lives--;
+					if(this.player.lives <= 0)
+					{
+						this.gameover = true
+					}
+				}
+
+				if(this.state)
+				{
+					this.state.update();
+
+					if(this.state.erease)
+						this.next = true;
+				}
+			}
 		else
-		{
-			if(this.player.collide(this.state))
-			{
-				console.log("tak");
-				this.state.erease = true;
-			}
-
-			if(this.state)
-			{
-				this.state.update();
-
-				if(this.state.erease)
-					this.next = true;
-			}
-		}
+			console.log("GAME OVER")
 
 	}
 
@@ -344,7 +354,8 @@ $(function(){
 	}
 
 	keyboard = function(e){
-		player.move(e);
+		if(player.lives > 0)
+			player.move(e);
 	}
 
 	// initialization
