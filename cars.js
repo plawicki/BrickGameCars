@@ -6,7 +6,6 @@ $(function(){
 	var darkbackground = "#8A9B93";
 	var background = "#98B0A3";
 	var lines = "#000200";
-	var speed = 33;
 
 	canvas.style.background = background;
 	canvas.width = document.body.clientWidth;
@@ -71,7 +70,7 @@ $(function(){
 
 	}
 
-	board = function(position, width, height, gap, score, tile, cars, player, background){
+	board = function(position, width, height, gap, score, tile, cars, player, background, loopSpeed){
 		this.position = position;
 
 		this.background = background;
@@ -86,6 +85,7 @@ $(function(){
 		this.state = null;
 
 		this.score = score = 0;
+		this.scoreChanged = false
 
 		// ref to tile used to draw
 		this.tile = tile;
@@ -99,7 +99,6 @@ $(function(){
 		this.next = true;
 
 		this.gameover = false;
-
 	}
 
 	board.prototype.update = function(){
@@ -114,9 +113,13 @@ $(function(){
 				this.state = rnd;
 				this.next = false;
 				this.score++;
+				this.scoreChanged = true;
 			}
 			else
 			{
+				if(this.scoreChanged)
+					this.scoreChanged = false;
+
 				if(this.player.collide(this.state))
 				{
 					this.state.erease = true;
@@ -136,7 +139,9 @@ $(function(){
 				}
 			}
 		else
+		{
 			console.log("GAME OVER " + this.score)
+		}
 
 	}
 
@@ -366,13 +371,27 @@ $(function(){
 
 	$(document).keypress(keyboard);
 
-	var board = new board(new vector(4,1), 10, 20, 2, 0, tile, cars, player, darkbackground, speed);
+	var board = new board(new vector(4,1), 10, 20, 2, 0, tile, cars, player, darkbackground, loopSpeed);
 
 	updateGame = function(){
+		console.log(loopSpeed);
+
 		board.update();
+		if(board.score % 10 === 0 && board.scoreChanged && loopSpeed > 30)
+			changeSpeed(loopSpeed-10)
 		board.draw(ctx);
+
 	}
 
+	var loopSpeed = 80;
 
-	gameloop = setInterval(updateGame, speed);
+	var gameloop = setInterval(updateGame, loopSpeed);
+
+	var changeSpeed = function(speed){
+		loopSpeed = speed;
+
+		clearInterval(gameloop);
+		gameloop = setInterval(updateGame, loopSpeed);
+	}
+
 })
