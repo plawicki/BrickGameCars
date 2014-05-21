@@ -85,7 +85,7 @@ $(function(){
 		// container for actual cars 
 		this.state = null;
 
-		this.score = score;
+		this.score = score = 0;
 
 		// ref to tile used to draw
 		this.tile = tile;
@@ -119,7 +119,6 @@ $(function(){
 			{
 				if(this.player.collide(this.state))
 				{
-					console.log("tak");
 					this.state.erease = true;
 					this.player.lives--;
 					if(this.player.lives <= 0)
@@ -137,7 +136,7 @@ $(function(){
 				}
 			}
 		else
-			console.log("GAME OVER")
+			console.log("GAME OVER " + this.score)
 
 	}
 
