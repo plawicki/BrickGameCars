@@ -6,7 +6,7 @@ $(function(){
 	var darkbackground = "#8A9B93";
 	var background = "#98B0A3";
 	var lines = "#000200";
-	var speed = 60;
+	var speed = 120;
 
 	canvas.style.background = background;
 	canvas.width = document.body.clientWidth;
@@ -110,9 +110,16 @@ $(function(){
 			var rnd = new car(new vector(x,1), type, 0, this.tile, this.cars, 2);
 			this.state = rnd;
 			this.next = false;
+			this.score++;
 		}
 		else
 		{
+			if(this.player.collide(this.state))
+			{
+				console.log("tak");
+				this.state.erease = true;
+			}
+
 			if(this.state)
 			{
 				this.state.update();
@@ -306,10 +313,31 @@ $(function(){
 
 	}
 
-	player.prototype.update = function(){
+	player.prototype.collide = function(car){
 
 		// check collision
 
+		for(var gx=0; gx<3; gx++)
+		{
+			for(var gy=0; gy<4; gy++)
+			{
+				// checking every brick contain another brick
+
+				for(var cx=0; cx<3; cx++)
+				{
+					for(var cy=0; cy<4; cy++)
+					{
+						if(this.car.shape[gx][gy] === 1 && car.shape[cx][cy] === 1 && (this.car.position.x + gx - (car.position.x + cx)) === 0 && (this.car.position.y + gy - (car.position.y + cy)) === 1)
+						{
+							console.log(this.car.position.x + gx );
+							return true;
+						}	
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 	player.prototype.draw = function(ctx){
