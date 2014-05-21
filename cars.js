@@ -112,7 +112,7 @@ $(function(){
 				//position, type, difficulty, tile, cars, gap
 				var x = Math.floor(Math.random() * (7 - 1) + 1);
 				var type = Math.floor(Math.random() * (this.cars.length - 0) + 0)
-				var rnd = new car(new vector(x,1), type, 0, this.tile, this.cars, 2);
+				var rnd = new car(new vector(x,-3), type, 0, this.tile, this.cars, 2);
 				this.state = rnd;
 				this.next = false;
 				this.score++;
